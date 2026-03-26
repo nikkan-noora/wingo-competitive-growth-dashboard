@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WingoMarkets - Competitive Growth Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        :root, [data-theme="light"] {
+            --color-bg: #f7f6f2;
+            --color-surface: #ffffff;
+            --color-surface-2: #fbfbf9;
+            --color-text: #28251d;
+            --color-text-muted: #7a7974;
+            --color-text-faint: #bab9b4;
+            --color-border: #d4d1ca;
+            --color-primary: #00b990;
+            --color-secondary: #30cf81;
+            --color-grey: #707b75;
+            --color-accent: #fdd989;
+            --color-error: #a13544;
+            --color-warning: #da7101;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        [data-theme="dark"] {
+            --color-bg: #0f1419;
+            --color-surface: #1a1f2e;
+            --color-surface-2: #242b3d;
+            --color-text: #e6e8eb;
+            --color-text-muted: #8b92a7;
+            --color-text-faint: #5a5f73;
+            --color-border: #2d3548;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .header {
+            background: var(--color-surface);
+            border-bottom: 1px solid var(--color-border);
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+
+        .theme-toggle {
+            background: var(--color-surface-2);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            color: var(--color-text);
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 3rem 0;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.125rem;
+            color: var(--color-text-muted);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
+        }
+
+        .kpi-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .kpi-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .kpi-subtitle {
+            font-size: 0.875rem;
+            color: var(--color-text-faint);
+        }
+
+        .section {
+            margin: 4rem 0;
+        }
+
+        .section-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-subtitle {
+            font-size: 1rem;
+            color: var(--color-text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        .positioning-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        @media (max-width: 1024px) {
+            .positioning-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .positioning-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 2rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--color-surface);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        th {
+            background: var(--color-surface-2);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--color-text-muted);
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background: var(--color-surface-2);
+        }
+
+        .score-high { color: var(--color-primary); font-weight: 600; }
+        .score-mid { color: var(--color-accent); font-weight: 600; }
+        .score-low { color: var(--color-error); font-weight: 600; }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-success {
+            background: rgba(0, 185, 144, 0.1);
+            color: var(--color-primary);
+        }
+
+        .badge-warning {
+            background: rgba(253, 217, 137, 0.2);
+            color: var(--color-accent);
+        }
+
+        .badge-danger {
+            background: rgba(161, 53, 68, 0.1);
+            color: var(--color-error);
+        }
+
+        .critical-gap {
+            background: var(--color-surface);
+            border-left: 4px solid var(--color-error);
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+        }
+
+        .advantage {
+            background: var(--color-surface);
+            border-left: 4px solid var(--color-primary);
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+        }
+
+        .priority-list {
+            list-style: none;
+            counter-reset: priority;
+        }
+
+        .priority-list li {
+            counter-increment: priority;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            position: relative;
+        }
+
+        .priority-list li::before {
+            content: counter(priority);
+            position: absolute;
+            left: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--color-primary);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.875rem;
+        }
+
+        .priority-title {
+            font-weight: 600;
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+            margin-left: 1.5rem;
+        }
+
+        .priority-content {
+            margin-left: 1.5rem;
+            color: var(--color-text-muted);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">WingoMarkets</div>
+            <button class="theme-toggle" data-theme-toggle>
+                <span id="theme-label">☀️ Light Mode</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="hero">
+            <h1>Iraq & Kurdistan Competitive Growth Dashboard</h1>
+            <p>Deep competitive intelligence analysis: WingoMarkets vs VarinFX vs VCG Markets vs INGOT Brokers</p>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">Market Position</div>
+                <div class="kpi-value" style="color: var(--color-primary);">#2</div>
+                <div class="kpi-subtitle">Best IB Economics</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">IB Attractiveness</div>
+                <div class="kpi-value" style="color: var(--color-primary);">8.5/10</div>
+                <div class="kpi-subtitle">Leading Advantage</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Trust Score</div>
+                <div class="kpi-value" style="color: var(--color-error);">5/10</div>
+                <div class="kpi-subtitle">Critical Gap</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Local Presence</div>
+                <div class="kpi-value" style="color: var(--color-error);">2.5/10</div>
+                <div class="kpi-subtitle">Critical Gap</div>
+            </div>
+        </div>
+
+        <!-- Competitive Scorecard Radar -->
+        <div class="section">
+            <h2 class="section-title">📊 Competitive Scorecard</h2>
+            <p class="section-subtitle">Multi-dimensional comparison across 10 strategic factors</p>
+            <div class="chart-container">
+                <canvas id="radarChart" height="400"></canvas>
+            </div>
+        </div>
+
+        <!-- Market Positioning Matrix - 6 Maps -->
+        <div class="section">
+            <h2 class="section-title">🗺️ Market Positioning Matrix</h2>
+            <p class="section-subtitle">6 strategic positioning maps revealing competitive dynamics</p>
+            
+            <div class="positioning-grid">
+                <div class="chart-container">
+                    <h3 class="chart-title">1. Trust & Safety</h3>
+                    <canvas id="trustSafetyChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3 class="chart-title">2. Localization & Iraq Fit</h3>
+                    <canvas id="localizationChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3 class="chart-title">3. Social Proof</h3>
+                    <canvas id="socialProofChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3 class="chart-title">4. Market Opportunity</h3>
+                    <canvas id="marketOpportunityChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3 class="chart-title">5. Cost & Performance</h3>
+                    <canvas id="costPerformanceChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3 class="chart-title">6. Learning & IB</h3>
+                    <canvas id="learningIBChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Account Structure Comparison - 4 Tables -->
+        <div class="section">
+            <h2 class="section-title">📋 Account Structure Deep Dive</h2>
+            <p class="section-subtitle">Comprehensive account mechanics, pricing, and strategic fit analysis</p>
+
+            <!-- Table 1: Core Account Mechanics -->
+            <h3 style="margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: 600;">Table 1: Core Account Mechanics</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Broker</th>
+                            <th>Entry Account</th>
+                            <th>Min Deposit</th>
+                            <th>Max Leverage</th>
+                            <th>Execution Model</th>
+                            <th>Islamic Available?</th>
+                            <th>Platforms</th>
+                            <th>Instruments</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Wingo Markets</strong></td>
+                            <td>Social Trade / Standard</td>
+                            <td class="score-high">$5–100</td>
+                            <td class="score-high">1:500</td>
+                            <td>Hybrid B-/A-book</td>
+                            <td><span class="badge badge-success">Yes (swap-free)</span></td>
+                            <td>MT5 + Social Trade</td>
+                            <td class="score-high">200–900+</td>
+                        </tr>
+                        <tr>
+                            <td><strong>VarinFX</strong></td>
+                            <td>Standard</td>
+                            <td class="score-low">$200–5000</td>
+                            <td class="score-mid">~1:200–500</td>
+                            <td>Claimed ECN (B-book heavy)</td>
+                            <td><span class="badge badge-success">Yes (all)</span></td>
+                            <td>MT5</td>
+                            <td class="score-low">~45 FX + limited</td>
+                        </tr>
+                        <tr>
+                            <td><strong>VCG Markets</strong></td>
+                            <td>Standard</td>
+                            <td class="score-mid">$500</td>
+                            <td class="score-high">1:500</td>
+                            <td>Spread-led STP</td>
+                            <td><span class="badge badge-warning">On request</span></td>
+                            <td>MT5</td>
+                            <td class="score-high">500+</td>
+                        </tr>
+                        <tr>
+                            <td><strong>INGOT Brokers</strong></td>
+                            <td>EVO / Professional</td>
+                            <td class="score-high">$10–100</td>
+                            <td class="score-high">1:500–1:5000</td>
+                            <td>Mixed spread + ECN</td>
+                            <td><span class="badge badge-success">Yes (dedicated)</span></td>
+                            <td>MT4/5 + Copy Trader</td>
+                            <td class="score-high">1000+</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Table 2: Pricing & IB Economics -->
+            <h3 style="margin-top: 3rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: 600;">Table 2: Pricing & IB Economics</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Broker</th>
+                            <th>Avg EURUSD Spread</th>
+                            <th>Commission (entry)</th>
+                            <th>IB Rebate Model</th>
+                            <th>Pricing Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Wingo Markets</strong></td>
+                            <td>~1.5 pips (Standard); 0.1–0.5 (ECN)</td>
+                            <td>$0 (Standard); $2–3/side (ECN)</td>
+                            <td>Multi-level per-lot (high % of margin)</td>
+                            <td class="score-high">8/10</td>
+                        </tr>
+                        <tr>
+                            <td><strong>VarinFX</strong></td>
+                            <td>~3.0 pips ("30 pips*")</td>
+                            <td class="score-low">$30 fixed/lot</td>
+                            <td>Private negotiation (from markup)</td>
+                            <td class="score-low">3.5/10</td>
+                        </tr>
+                        <tr>
+                            <td><strong>VCG Markets</strong></td>
+                            <td>Dynamic ~1.0–1.5 pips</td>
+                            <td>Modest / none on Standard</td>
+                            <td>Rev-share up to 50%</td>
+                            <td class="score-mid">6.5/10</td>
+                        </tr>
+                        <tr>
+                            <td><strong>INGOT Brokers</strong></td>
+                            <td>0.7–1.2 pips (EVO/Prof); tight on ECN</td>
+                            <td>$0 (EVO); $5–7 (ECN)</td>
+                            <td>Clear ladder + cashback</td>
+                            <td class="score-high">9/10</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Table 3: IB & Trader Fit -->
+            <h3 style="margin-top: 3rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: 600;">Table 3: IB & Trader Fit</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Broker</th>
+                            <th>Easiest IB Sell Story</th>
+                            <th>Beginner Fit</th>
+                            <th>Pro Trader Fit</th>
+                            <th>Retention Driver</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Wingo Markets</strong></td>
+                            <td>"Copy pros with $10 + 1:500"</td>
+                            <td class="score-high">8.5/10</td>
+                            <td class="score-mid">7.5/10</td>
+                            <td>Social copy loop + IB rebates</td>
+                        </tr>
+                        <tr>
+                            <td><strong>VarinFX</strong></td>
+                            <td>"Local Islamic account, office in Erbil"</td>
+                            <td class="score-mid">5/10</td>
+                            <td class="score-low">4/10</td>
+                            <td>Office relationships</td>
+                        </tr>
+                        <tr>
+                            <td><strong>VCG Markets</strong></td>
+                            <td>"Regulated Erbil broker, 1:500"</td>
+                            <td class="score-mid">5/10</td>
+                            <td class="score-mid">7/10</td>
+                            <td>Trust + office</td>
+                        </tr>
+                        <tr>
+                            <td><strong>INGOT Brokers</strong></td>
+                            <td>"$10 EVO, ASIC-linked, Islamic"</td>
+                            <td class="score-high">9/10</td>
+                            <td class="score-high">9/10</td>
+                            <td>Brand + copy trader</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Table 4: Strategic Scoring Grid -->
+            <h3 style="margin-top: 3rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: 600;">Table 4: Strategic Scoring Grid</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Broker</th>
+                            <th>Entry Barrier</th>
+                            <th>Leverage Appeal</th>
+                            <th>Pricing Edge</th>
+                            <th>IB Economics</th>
+                            <th>Segmentation</th>
+                            <th>Islamic Fit</th>
+                            <th>Total Score</th>
+                            <th>Quadrant</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Wingo Markets</strong></td>
+                            <td class="score-high">8</td>
+                            <td class="score-high">8.5</td>
+                            <td class="score-high">8</td>
+                            <td class="score-high">8.5</td>
+                            <td class="score-high">8</td>
+                            <td class="score-mid">7.5</td>
+                            <td class="score-high">8.1</td>
+                            <td><span class="badge badge-success">Micro + IB Leader</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>VarinFX</strong></td>
+                            <td class="score-low">4.5</td>
+                            <td class="score-mid">7</td>
+                            <td class="score-low">3.5</td>
+                            <td class="score-mid">7</td>
+                            <td class="score-low">3.5</td>
+                            <td class="score-high">9</td>
+                            <td class="score-low">5.8</td>
+                            <td><span class="badge badge-warning">Local Trust Only</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>VCG Markets</strong></td>
+                            <td class="score-mid">5</td>
+                            <td class="score-high">8</td>
+                            <td class="score-mid">6.5</td>
+                            <td class="score-mid">7</td>
+                            <td class="score-mid">6</td>
+                            <td class="score-high">8</td>
+                            <td class="score-mid">6.8</td>
+                            <td><span class="badge badge-warning">Mid-Ticket Safe</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>INGOT Brokers</strong></td>
+                            <td class="score-high">9</td>
+                            <td class="score-high">9.5</td>
+                            <td class="score-high">9</td>
+                            <td class="score-high">9</td>
+                            <td class="score-high">9</td>
+                            <td class="score-high">8.5</td>
+                            <td class="score-high">9.0</td>
+                            <td><span class="badge badge-success">Overall Best</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Critical Gaps Analysis -->
+        <div class="section">
+            <h2 class="section-title">🚨 Critical Gaps & Advantages</h2>
+            
+            <div class="critical-gap">
+                <h3 style="margin-bottom: 0.5rem; color: var(--color-error);">🚨 Trust Gap</h3>
+                <p style="color: var(--color-text-muted);">Mwali/Comoros licensing narrative, no withdrawal statistics, inconsistent leverage messaging. Competitors can weaponize "offshore broker" framing.</p>
+            </div>
+
+            <div class="critical-gap">
+                <h3 style="margin-bottom: 0.5rem; color: var(--color-error);">🏢 Local Presence Gap</h3>
+                <p style="color: var(--color-text-muted);">No Erbil office while VarinFX and VCG have physical locations. In Kurdistan, "I can visit" = conversion asset.</p>
+            </div>
+
+            <div class="critical-gap">
+                <h3 style="margin-bottom: 0.5rem; color: var(--color-error);">🌍 Localization Gap</h3>
+                <p style="color: var(--color-text-muted);">English/Persian only, missing Kurdish/Arabic for IB conversion. VCG runs Kurdistan-branded channels; Wingo doesn't.</p>
+            </div>
+
+            <div class="advantage">
+                <h3 style="margin-bottom: 0.5rem; color: var(--color-primary);">✅ IB Economics Advantage</h3>
+                <p style="color: var(--color-text-muted);">3-level rebate system, multi-level partner program, transparent per-lot grid. Beats VCG's rev-share and VarinFX's opaque deals.</p>
+            </div>
+
+            <div class="advantage">
+                <h3 style="margin-bottom: 0.5rem; color: var(--color-primary);">🎯 Account Structure Advantage</h3>
+                <p style="color: var(--color-text-muted);">$5 Social Trade entry, clear Starter→ECN→RAW→VIP ladder with published spreads. VarinFX has cosmetic segmentation (3.5/10 vs Wingo's 8/10).</p>
+            </div>
+        </div>
+
+        <!-- Strategic Priorities -->
+        <div class="section">
+            <h2 class="section-title">🎯 5 Strategic Priorities</h2>
+            <p class="section-subtitle">Ranked actions to close gaps and dominate Iraq/Kurdistan</p>
+
+            <ol class="priority-list">
+                <li>
+                    <div class="priority-title">Build Local Trust Anchor in Erbil</div>
+                    <div class="priority-content">
+                        Secure World Trade Center address or verified rep center. Hire Kurdish/Arabic support staff. Launch WhatsApp business line with Iraq number. Match VCG/VarinFX on "walk-in" credibility.
+                    </div>
+                </li>
+                <li>
+                    <div class="priority-title">Launch Kurdish/Arabic Localization</div>
+                    <div class="priority-content">
+                        Full website translation (Kurdish CKB + Arabic). Create IB marketing kit in local languages. Launch Kurdish Telegram channel with daily signals. Close the 4.5/10 localization gap.
+                    </div>
+                </li>
+                <li>
+                    <div class="priority-title">Operationalize Trust Proof System</div>
+                    <div class="priority-content">
+                        Public withdrawal transparency page (anonymized stats). Commit to 24-hour SLA with published metrics. Real-time withdrawal confirmation channel. Move from "claims" to "proof."
+                    </div>
+                </li>
+                <li>
+                    <div class="priority-title">Launch Iraq-Optimized Account Tier</div>
+                    <div class="priority-content">
+                        Create "$20–50 Iraq Starter" with Islamic/swap-free default. Kurdish/Arabic branding and dedicated landing page. IBs can sell "true micro account with local support."
+                    </div>
+                </li>
+                <li>
+                    <div class="priority-title">Attack VarinFX on Regulatory Weakness</div>
+                    <div class="priority-content">
+                        SVG "certification" is attackable (SVG has no Forex regulation per advisory). Position Wingo as "transparent pricing + verifiable licensing" alternative. Expose 30 pips/$30 lot markup.
+                    </div>
+                </li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Theme toggle
+        (function(){
+            const toggle = document.querySelector('[data-theme-toggle]');
+            const root = document.documentElement;
+            const label = document.getElementById('theme-label');
+            let theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            root.setAttribute('data-theme', theme);
+            label.textContent = theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+            
+            toggle.addEventListener('click', () => {
+                theme = theme === 'dark' ? 'light' : 'dark';
+                root.setAttribute('data-theme', theme);
+                label.textContent = theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+                
+                // Update charts
+                updateAllCharts();
+            });
+        })();
+
+        // Brand colors
+        const colors = {
+            wingo: '#00b990',
+            varinFX: '#fdd989',
+            vcg: '#30cf81',
+            ingot: '#707b75'
+        };
+
+        // Chart defaults
+        Chart.defaults.font.family = 'Inter, sans-serif';
+        Chart.defaults.color = getComputedStyle(document.documentElement).getPropertyValue('--color-text').trim();
+
+        function getChartConfig() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            return {
+                textColor: getComputedStyle(document.documentElement).getPropertyValue('--color-text').trim(),
+                gridColor: getComputedStyle(document.documentElement).getPropertyValue('--color-border').trim(),
+                isDark
+            };
+        }
+
+        // Radar Chart
+        const radarData = {
+            labels: ['Trust', 'Local Presence', 'IB Economics', 'Beginner Access', 'Pro Appeal', 'Account Quality', 'Localization', 'Retention', 'Marketing', 'Threat Level'],
+            datasets: [
+                {
+                    label: 'Wingo',
+                    data: [5, 2.5, 8.5, 8, 7, 8, 4.5, 7.5, 6.5, 0],
+                    borderColor: colors.wingo,
+                    backgroundColor: colors.wingo + '20',
+                    borderWidth: 2
+                },
+                {
+                    label: 'VarinFX',
+                    data: [6, 8.5, 7, 4.5, 4.5, 3.5, 9, 6.5, 7.5, 6],
+                    borderColor: colors.varinFX,
+                    backgroundColor: colors.varinFX + '20',
+                    borderWidth: 2
+                },
+                {
+                    label: 'VCG',
+                    data: [8, 9, 7, 5, 7, 6, 8, 7, 7, 8],
+                    borderColor: colors.vcg,
+                    backgroundColor: colors.vcg + '20',
+                    borderWidth: 2
+                },
+                {
+                    label: 'INGOT',
+                    data: [8.5, 3, 9, 8, 9, 9, 7, 8, 7, 9],
+                    borderColor: colors.ingot,
+                    backgroundColor: colors.ingot + '20',
+                    borderWidth: 2
+                }
+            ]
+        };
+
+        let radarChart = new Chart(document.getElementById('radarChart'), {
+            type: 'radar',
+            data: radarData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 10,
+                        ticks: {
+                            stepSize: 2,
+                            color: getChartConfig().textColor
+                        },
+                        grid: {
+                            color: getChartConfig().gridColor
+                        },
+                        pointLabels: {
+                            color: getChartConfig().textColor,
+                            font: { size: 11 }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { 
+                            color: getChartConfig().textColor,
+                            padding: 20,
+                            font: { size: 12 }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Positioning Maps
+        function createScatterChart(canvasId, title, xLabel, yLabel, data) {
+            const config = getChartConfig();
+            return new Chart(document.getElementById(canvasId), {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Wingo',
+                            data: [data.wingo],
+                            backgroundColor: colors.wingo,
+                            borderColor: colors.wingo,
+                            pointRadius: 8,
+                            pointHoverRadius: 10
+                        },
+                        {
+                            label: 'VarinFX',
+                            data: [data.varinFX],
+                            backgroundColor: colors.varinFX,
+                            borderColor: colors.varinFX,
+                            pointRadius: 8,
+                            pointHoverRadius: 10
+                        },
+                        {
+                            label: 'VCG',
+                            data: [data.vcg],
+                            backgroundColor: colors.vcg,
+                            borderColor: colors.vcg,
+                            pointRadius: 8,
+                            pointHoverRadius: 10
+                        },
+                        {
+                            label: 'INGOT',
+                            data: [data.ingot],
+                            backgroundColor: colors.ingot,
+                            borderColor: colors.ingot,
+                            pointRadius: 8,
+                            pointHoverRadius: 10
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 1,
+                    scales: {
+                        x: {
+                            title: { display: true, text: xLabel, color: config.textColor },
+                            min: 0,
+                            max: 10,
+                            ticks: { color: config.textColor },
+                            grid: { color: config.gridColor }
+                        },
+                        y: {
+                            title: { display: true, text: yLabel, color: config.textColor },
+                            min: 0,
+                            max: 10,
+                            ticks: { color: config.textColor },
+                            grid: { color: config.gridColor }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: (${context.parsed.x}, ${context.parsed.y})`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize all positioning charts
+        let trustSafetyChart = createScatterChart('trustSafetyChart', 'Trust & Safety', 'Regulation Strength', 'Withdrawal Reliability', {
+            wingo: {x: 4.5, y: 5},
+            varinFX: {x: 3, y: 6.5},
+            vcg: {x: 4.5, y: 5},
+            ingot: {x: 7.5, y: 8}
+        });
+
+        let localizationChart = createScatterChart('localizationChart', 'Localization & Iraq Fit', 'Arabic Depth', 'Islamic Accounts', {
+            wingo: {x: 6, y: 7.5},
+            varinFX: {x: 9, y: 9},
+            vcg: {x: 9, y: 8},
+            ingot: {x: 7, y: 8.5}
+        });
+
+        let socialProofChart = createScatterChart('socialProofChart', 'Social Proof', 'Copy Trading', 'Community & IBs', {
+            wingo: {x: 9, y: 7.5},
+            varinFX: {x: 5.5, y: 9},
+            vcg: {x: 7.5, y: 7.5},
+            ingot: {x: 8, y: 8}
+        });
+
+        let marketOpportunityChart = createScatterChart('marketOpportunityChart', 'Market Opportunity', 'High Leverage', 'Instruments', {
+            wingo: {x: 8.5, y: 9},
+            varinFX: {x: 7, y: 5.5},
+            vcg: {x: 8, y: 8},
+            ingot: {x: 9.5, y: 9}
+        });
+
+        let costPerformanceChart = createScatterChart('costPerformanceChart', 'Cost & Performance', 'Low Min Deposit', 'Execution Quality', {
+            wingo: {x: 8, y: 7.5},
+            varinFX: {x: 4.5, y: 4},
+            vcg: {x: 5, y: 6.5},
+            ingot: {x: 9, y: 8.5}
+        });
+
+        let learningIBChart = createScatterChart('learningIBChart', 'Learning & IB', 'Education', 'IB Offer', {
+            wingo: {x: 6, y: 8.5},
+            varinFX: {x: 6.5, y: 7},
+            vcg: {x: 7, y: 7},
+            ingot: {x: 6.5, y: 9}
+        });
+
+        // Function to update all charts on theme change
+        function updateAllCharts() {
+            const config = getChartConfig();
+            
+            // Update radar chart
+            radarChart.options.scales.r.ticks.color = config.textColor;
+            radarChart.options.scales.r.grid.color = config.gridColor;
+            radarChart.options.scales.r.pointLabels.color = config.textColor;
+            radarChart.options.plugins.legend.labels.color = config.textColor;
+            radarChart.update();
+
+            // Update scatter charts
+            [trustSafetyChart, localizationChart, socialProofChart, marketOpportunityChart, costPerformanceChart, learningIBChart].forEach(chart => {
+                chart.options.scales.x.title.color = config.textColor;
+                chart.options.scales.x.ticks.color = config.textColor;
+                chart.options.scales.x.grid.color = config.gridColor;
+                chart.options.scales.y.title.color = config.textColor;
+                chart.options.scales.y.ticks.color = config.textColor;
+                chart.options.scales.y.grid.color = config.gridColor;
+                chart.update();
+            });
+        }
+    </script>
+</body>
+</html>
